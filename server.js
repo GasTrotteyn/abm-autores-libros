@@ -46,7 +46,7 @@ server.put('/autores/:id', (req, res) => {
     const nuevoBody = req.body;
     autores.push(nuevoBody);
     res.status(200).send(`listo, sacamos a ${autor.nombre} y pusimos a ${nuevoBody.nombre}`);
-    console.log(autores); ////esta va como piña///
+    //console.log(autores); ////esta va como piña///
 });
 
 ///////////// autores/:id/libros- GET: devuelve todos los libros de un autor ///////////////////
@@ -73,10 +73,13 @@ server.post('/autores/:id/libros', (req, res) => {
 server.get('/autores/:id/libros/:idLibro', (req, res) => {
     const idAutorRequerido = parseInt(req.params.id);
     let autor = autores.find(element => element.id === idAutorRequerido);
-    const libros = autor.libros;
-    let libroRequerido = parseInt(req.params.idLibro);
-    console.log(libroRequerido);
-    const libro = libros.find(element => element.id = libroRequerido);
-    res.json(libro);
+    if (autor) {
+        const libros = autor.libros;
+        let libroRequerido = parseInt(req.params.idLibro);
+        console.log(libroRequerido);
+        const libro = libros.find(obra => obra.id === libroRequerido);
+        res.json(libro);
+    };
+    res.status(400).send(`autor inexistente`);
 });
 
