@@ -12,7 +12,8 @@ server.listen(3000, () => {
 let autores = [
     {
         id: 1,
-        nombre: "Ursula K. Le Guin",
+        nombre: "Ursula",
+        apellido: "Lopez",
         libros: [
             { id: 1, titulo: "La mano izquierda de la oscuridad" },
             { id: 2, titulo: "La rueda celeste" }
@@ -20,11 +21,12 @@ let autores = [
     },
     {
         id: 2,
-        nombre: "J.R.R. Tolkien",
+        nombre: "Tolkien",
+        apellido: "Perez",
         libros: [
-            { id: 1, nombre: "El señor de los anillos: La comunidad" },
-            { id: 2, nombre: "El señor: Las dos torres" },
-            { id: 3, nombre: "El señor: El retorno del rey" }
+            { id: 1, titulo: "El señor de los anillos: La comunidad" },
+            { id: 2, titulo: "El señor: Las dos torres" },
+            { id: 3, titulo: "El señor: El retorno del rey" }
         ]
     }
 ];
@@ -33,12 +35,25 @@ server.get('/autores', (req, res) => {
     res.json(autores);
 });
 
+
+/////POST /autores- Si ya existe un autor con mismo nombre y apellido,devuelve 409  ////
+////- De lo contrario agrega el nuevo autor y devuelve 201 con el JSON correspondiente al autor/////
+
 server.post('/autores', (req, res) => {
     const nuevoAutor = req.body;
-    autores.push(nuevoAutor);
-    res.json('Autor agregado');
-    console.log(autores);
+    let autor = autores.find(element => element.nombre === nuevoAutor.nombre); //&& element.apellido === nuevoAutor.apellido);
+    if (autor) {
+        res.status(409).send('ese autor ya existe');
+    } else {
+        autores.push(nuevoAutor);
+        res.status(201).json(nuevoAutor);
+        console.log(autores);
+    };
 })
+
+//////// GET /autores/:id- Si el autor no existe devuelve 404  //////
+//////// - De lo contrario devuelve 200 con el autor correspondiente  ///////
+
 
 server.get('/autores/:id', (req, res) => {
     const idAutor = parseInt(req.params.id);
@@ -104,4 +119,42 @@ server.get('/autores/:id/libros/:idLibro', (req, res) => {
 });
 
 
+//////////// /autores/:id/libros/:idLibro- DELETE: eliminar el libro con el id indicado del autor  ///////////////
+
+server.delete('/autores/:id/libros/:idLibro', (req, res) => {
+    const idAutorRequerido = parseInt(req.params.id);
+    let autor = autores.find(element => element.id === idAutorRequerido);
+    if (autor) {
+        const libros = autor.libros;
+        let libroRequerido = parseInt(req.params.idLibro);
+        const libro = libros.find(obra => obra.id === libroRequerido);
+        if (libro) {
+            index = libros.indexOf(libro);
+            libros.splice(index, 1);
+            res.status(200).send(`se ha eliminado ${JSON.stringify(libro.titulo)} del autor ${JSON.stringify(autor.nombre)}`);
+        };
+        res.status(404).send(`libro inexistente`);
+    };
+    res.status(404).send(`autor inexistente`);
+});
+
+//////////// /autores/:id/libros/:idLibro- PUT: modifica el libro con el id indicado del autor  ///////////////
+
+server.put('/autores/:id/libros/:idLibro', (req, res) => {
+    const idAutorRequerido = parseInt(req.params.id);
+    let autor = autores.find(element => element.id === idAutorRequerido);
+    if (autor) {
+        const libros = autor.libros;
+        let libroRequerido = parseInt(req.params.idLibro);
+        const libro = libros.find(obra => obra.id === libroRequerido);
+        if (libro) {
+            index = libros.indexOf(libro);
+            libros.splice(index, 1);
+            libros.push(req.body);
+            res.status(200).send(`se ha remplazado ${JSON.stringify(libro.titulo)} por ${JSON.stringify(req.body.titulo)}`);
+        };
+        res.status(404).send(`libro inexistente`);
+    };
+    res.status(404).send(`autor inexistente`);
+});
 
