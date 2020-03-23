@@ -9,7 +9,25 @@ server.use(bodyParser.json());
 server.listen(3000, () => {
     console.log('servidor andando');
 });
-let autores = [];
+let autores = [
+    {
+        id: 1,
+        nombre: "Ursula K. Le Guin",
+        libros: [
+            { id: 1, titulo: "La mano izquierda de la oscuridad" },
+            { id: 2, titulo: "La rueda celeste" }
+        ]
+    },
+    {
+        id: 2,
+        nombre: "J.R.R. Tolkien",
+        libros: [
+            { id: 1, nombre: "El señor de los anillos: La comunidad" },
+            { id: 2, nombre: "El señor: Las dos torres" },
+            { id: 3, nombre: "El señor: El retorno del rey" }
+        ]
+    }
+];
 
 server.get('/autores', (req, res) => {
     res.json(autores);
@@ -76,10 +94,14 @@ server.get('/autores/:id/libros/:idLibro', (req, res) => {
     if (autor) {
         const libros = autor.libros;
         let libroRequerido = parseInt(req.params.idLibro);
-        console.log(libroRequerido);
         const libro = libros.find(obra => obra.id === libroRequerido);
-        res.json(libro);
+        if (libro) {
+            res.json(libro);
+        };
+        res.status(400).send(`libro inexistente`);
     };
     res.status(400).send(`autor inexistente`);
 });
+
+
 
