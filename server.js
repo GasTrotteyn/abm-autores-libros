@@ -9,6 +9,7 @@ server.use(bodyParser.json());
 server.listen(3000, () => {
     console.log('servidor andando');
 });
+
 let autores = [
     {
         id: 1,
@@ -35,7 +36,6 @@ server.get('/autores', (req, res) => {
     res.json(autores);
 });
 
-
 /////POST /autores- Si ya existe un autor con mismo nombre y apellido,devuelve 409  ////
 ////- De lo contrario agrega el nuevo autor y devuelve 201 con el JSON correspondiente al autor/////
 
@@ -53,7 +53,6 @@ server.post('/autores', (req, res) => {
 
 //////// GET /autores/:id- Si el autor no existe devuelve 404  //////
 //////// - De lo contrario devuelve 200 con el autor correspondiente  SEGUIR ACA   ///////
-
 
 server.get('/autores/:id', (req, res) => {
     const idAutor = parseInt(req.params.id);
@@ -73,45 +72,60 @@ server.delete('/autores/:id', (req, res) => {
     if (autor) {
         let index = autores.indexOf(autor);
         autores.splice(index, 1);
-        res.status(204).json(`Listo, al tal ${autor.nombre} ya lo borramos`);
+        res.status(204).send();
     } else {
         res.status(404).send(`autor inexistente`);
     }
 });
 
-
+///////   PUT /autores/:id - Si el autor no existe devuelve 404 ////////////////
+///////  - De lo contrario modifica el autor y devuelve 200 con el autor correspondiente /////////////
 
 server.put('/autores/:id', (req, res) => {
     const idAutor = parseInt(req.params.id);
     let autor = autores.find(element => element.id === idAutor);
-    let index = autores.indexOf(autor);
-    autores.splice(index, 1);
-    const nuevoBody = req.body;
-    autores.push(nuevoBody);
-    res.status(200).send(`listo, sacamos a ${autor.nombre} y pusimos a ${nuevoBody.nombre}`);
+    if (autor) {
+        let index = autores.indexOf(autor);
+        autores.splice(index, 1);
+        const nuevoBody = req.body;
+        autores.push(nuevoBody);
+        res.status(200).send(`listo, sacamos a ${autor.nombre} y pusimos a ${nuevoBody.nombre}`);
+    }
+    res.status(404).send();
     //console.log(autores); ////esta va como piña///
 });
 
-///////////// autores/:id/libros- GET: devuelve todos los libros de un autor ///////////////////
+///// GET /autores/:id/libros- Si el autor no existe devuelve 404 //////////////
+///// - si el autor no tiene ningún libro devuelve 200 con un array vacío /////////
+///// Caso contrario devuelve 200 con la lista de libros del autor   ///////////////////
 
 server.get('/autores/:id/libros', (req, res) => {
     const idAutor = parseInt(req.params.id);
     let autor = autores.find(element => element.id === idAutor);
-    const libros = autor.libros;
-    res.json(libros);
+    if (autor) {
+        const libros = autor.libros;
+        res.json(libros);
+    }
+    res.status(404).send('autor inexistente');
 });
 
-///////////// autores/:id/libros- POST: agrega un nuevo libro al autor ///////////////////////////
+///// POST /autores/:id/libros - Si el autor no existe devuelve 404 ////////
+/////- De lo contrario agrega el libro al autor y devuelve 201 con el libro agregado ///////////////////////////
 
 server.post('/autores/:id/libros', (req, res) => {
     const idAutor = parseInt(req.params.id);
     let autor = autores.find(element => element.id === idAutor);
-    libroInsertado = req.body;
-    autor.libros.push(libroInsertado);
-    res.status(201).send(`listo, ${libroInsertado.titulo} se agregó a ${autor.nombre}`);
+    if (autor) {
+        libroInsertado = req.body;
+        autor.libros.push(libroInsertado);
+        res.status(201).send(`listo, ${libroInsertado.titulo} se agregó a ${autor.nombre}`);
+    }
+    res.status(404).send('autor inexistente');
 });
 
-///////////// /autores/:id/libros/:idLibro- GET: devuelve el libro con el id indicado del autor ///////////////
+/////  GET /autores/:id/libros/:idLibro - Si el autor no existe devuelve 404 //////////////
+/////  - si el libro no existe devuelve 404 ////////////////
+/////  - Caso contrario devuelve 200 con el libro correspondiente ///////////////
 
 server.get('/autores/:id/libros/:idLibro', (req, res) => {
     const idAutorRequerido = parseInt(req.params.id);
@@ -123,13 +137,14 @@ server.get('/autores/:id/libros/:idLibro', (req, res) => {
         if (libro) {
             res.json(libro);
         };
-        res.status(400).send(`libro inexistente`);
+        res.status(404).send(`libro inexistente`);
     };
-    res.status(400).send(`autor inexistente`);
+    res.status(404).send(`autor inexistente`);
 });
 
-
-//////////// /autores/:id/libros/:idLibro- DELETE: eliminar el libro con el id indicado del autor  ///////////////
+///// DELETE /autores/:id/libros/:idLibro - Si el autor no existe devuelve 404 //////////////
+///// - Si el libro no existe devuelve 404 /////////////////
+///// - De lo contrario elimina el libro y devuelve 204 ///////////////
 
 server.delete('/autores/:id/libros/:idLibro', (req, res) => {
     const idAutorRequerido = parseInt(req.params.id);
@@ -141,14 +156,16 @@ server.delete('/autores/:id/libros/:idLibro', (req, res) => {
         if (libro) {
             index = libros.indexOf(libro);
             libros.splice(index, 1);
-            res.status(200).send(`se ha eliminado ${JSON.stringify(libro.titulo)} del autor ${JSON.stringify(autor.nombre)}`);
+            res.status(204).send();
         };
         res.status(404).send(`libro inexistente`);
     };
     res.status(404).send(`autor inexistente`);
 });
 
-//////////// /autores/:id/libros/:idLibro- PUT: modifica el libro con el id indicado del autor  ///////////////
+///// PUT /autores/:id/libros/:idLibro - Si el autor no existe devuelve 404 ///////////////
+///// - Si el libro no existe devuelve 404 ///////////
+///// - De lo contrario modifica el libro y devuelve 200 con el libro modificado  ///////////////
 
 server.put('/autores/:id/libros/:idLibro', (req, res) => {
     const idAutorRequerido = parseInt(req.params.id);
@@ -167,4 +184,3 @@ server.put('/autores/:id/libros/:idLibro', (req, res) => {
     };
     res.status(404).send(`autor inexistente`);
 });
-
