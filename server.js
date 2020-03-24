@@ -47,29 +47,40 @@ server.post('/autores', (req, res) => {
     } else {
         autores.push(nuevoAutor);
         res.status(201).json(nuevoAutor);
-        console.log(autores);
+        //console.log(autores);
     };
 })
 
 //////// GET /autores/:id- Si el autor no existe devuelve 404  //////
-//////// - De lo contrario devuelve 200 con el autor correspondiente  ///////
+//////// - De lo contrario devuelve 200 con el autor correspondiente  SEGUIR ACA   ///////
 
 
 server.get('/autores/:id', (req, res) => {
     const idAutor = parseInt(req.params.id);
-    //autor = autores[idAutor-1];/// así sería si el id estuviese ordenado y completo, pero si te borran un item, te cambia todo el orden 
     let autor = autores.find(element => element.id === idAutor);
-    res.json(autor);
+    if (autor) {
+        res.json(autor);
+    };
+    res.status(404).send(`autor inexistente`);
 })
+
+//////////////// DELETE /autores/:id - Si el autor no existe devuelve 404 ////////////////
+////////////// - De lo contrario elimina el autor y devuelve 204   ////////////////
+
 
 server.delete('/autores/:id', (req, res) => {
     const idAutor = parseInt(req.params.id);
     let autor = autores.find(element => element.id === idAutor);
-    let index = autores.indexOf(autor);
-    autores.splice(index, 1);
-    ///res.status(200).send(`Listo, al tal ${autor.nombre} ya lo borramos`);
-    res.status(204).send(`Listo, al tal ${autor.nombre} ya lo borramos`);
+    if (autor) {
+        let index = autores.indexOf(autor);
+        autores.splice(index, 1);
+        res.status(204).json(`Listo, al tal ${autor.nombre} ya lo borramos`);
+    } else {
+        res.status(404).send(`autor inexistente`);
+    }
 });
+
+
 
 server.put('/autores/:id', (req, res) => {
     const idAutor = parseInt(req.params.id);
