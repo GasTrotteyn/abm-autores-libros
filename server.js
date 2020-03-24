@@ -67,7 +67,6 @@ server.get('/autores/:id', (req, res) => {
 //////////////// DELETE /autores/:id - Si el autor no existe devuelve 404 ////////////////
 ////////////// - De lo contrario elimina el autor y devuelve 204   ////////////////
 
-
 server.delete('/autores/:id', (req, res) => {
     const idAutor = parseInt(req.params.id);
     let autor = autores.find(element => element.id === idAutor);
