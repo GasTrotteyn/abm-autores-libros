@@ -117,8 +117,11 @@ server.post('/autores/:id/libros', (req, res) => {
     let autor = autores.find(element => element.id === idAutor);
     if (autor) {
         libroInsertado = req.body;
-        autor.libros.push(libroInsertado);
-        res.status(201).send(`listo, ${libroInsertado.titulo} se agregó a ${autor.nombre}`);
+        let libro = autor.libros.find(element => element.id === libroInsertado.id)
+        if (!libro) {
+            autor.libros.push(libroInsertado);
+            res.status(201).send(`listo, ${libroInsertado.titulo} se agregó a ${autor.nombre}`);
+        } res.status(409).send('ese libro ya existe');
     }
     res.status(404).send('autor inexistente');
 });
