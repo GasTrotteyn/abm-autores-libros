@@ -41,7 +41,7 @@ server.get('/autores', (req, res) => {
 
 server.post('/autores', (req, res) => {
     const nuevoAutor = req.body;
-    let autor = autores.find(element => element.nombre === nuevoAutor.nombre); //&& element.apellido === nuevoAutor.apellido);
+    let autor = autores.find(element => element.nombre === nuevoAutor.nombre && element.apellido === nuevoAutor.apellido);
     if (autor) {
         res.status(409).send('ese autor ya existe');
     } else {
@@ -82,11 +82,11 @@ server.delete('/autores/:id', (req, res) => {
 ///////  - De lo contrario modifica el autor y devuelve 200 con el autor correspondiente /////////////
 
 server.put('/autores/:id', (req, res) => {
-    const idAutor = parseInt(req.params.id);
+    const idAutor = parseInt(req.body.id);
     let autor = autores.find(element => element.id === idAutor);
     if (autor) {
         let index = autores.indexOf(autor);
-        autores.splice(index, 1);
+        autores.splice(index, 1);//////////////averiguar .replace();
         const nuevoBody = req.body;
         autores.push(nuevoBody);
         res.status(200).send(`listo, sacamos a ${autor.nombre} y pusimos a ${nuevoBody.nombre}`);
